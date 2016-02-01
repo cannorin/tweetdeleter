@@ -6,6 +6,7 @@ open System.Text.RegularExpressions
 open System.Runtime.Serialization
 open System.Xml
 open System.Threading
+open System.Threading.Tasks
 open CoreTweet
 open CoreTweet.Core
 open FSharp.Interop.Dynamic
@@ -62,8 +63,10 @@ module Main =
                    )
                    |> Seq.concat in
 
-      printf "Do you speficy the period of tweet you want to delete? [y/N] ";
+      
       let dts =
+
+        printf "Do you speficy the period of tweet you want to delete? [y/N] ";
         if Console.ReadLine().ToLower() = "y" then
           let fmt = "yyyy/MM/dd HH:mm:ss" in
           printfn "Input start date in UTC +0. [%s]" fmt; printf "> ";
@@ -77,19 +80,29 @@ module Main =
       let l = Seq.length dts in
       printf "Do you want to delete these %i tweets? [Y/n] " l;
       if Console.ReadLine().ToLower() <> "n" then
-       let mutable c = 1 in
-        for (i, _) in dts do
-          let rec loop () =
-            try t.Statuses.Destroy(id = i) |> ignore
-            with
-              | e -> 
-                printfn "It seems to be rate limited. Waiting for 10 secs...";
-                Thread.Sleep 10000;
-                loop () in
-          loop ();
-          printfn "Deleted %i/%i (id: %i)." c l i;
-          Thread.Sleep 250;
-          c <- c + 1
+        seq {
+          let c = ref 1 in
+          for (i, _) in dts do
+            let rec loop () =
+              let cc = !c in
+              try 
+                t.Statuses.Destroy(id = i) |> ignore;
+                printfn "Deleted: %i/%i" cc l
+              with
+                | :? TwitterException as e -> 
+                  if e.Status = Net.HttpStatusCode.NotFound then
+                    printfn "This tweet is already deleted."
+                  else
+                    printfn "It seems to be rate limited. Waiting for 10 secs...";
+                    Thread.Sleep 10000;
+                    loop ()
+                | e -> raise e
+                in
+            yield Task.Run loop
+            c := !c + 1
+            Thread.Sleep 250
+        } |> Task.WhenAll 
+          |> fun f -> f.Start()
 
       printfn "Done."
       0
