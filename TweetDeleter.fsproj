@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{6A36EABD-6DBD-4E3E-AF55-50669DFEBA62}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TweetDeleter</RootNamespace>
+    <AssemblyName>tweetdeleter</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <Commandlineparameters>/home/alice/tweets/data/js/tweets/2015_03.js</Commandlineparameters>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="CoreTweet">
+      <HintPath>packages\CoreTweet.0.6.1.267\lib\net45\CoreTweet.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <HintPath>packages\DynamicJsonForDotNET.0.9.8\lib\40\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="DynamicJson">
+      <HintPath>packages\DynamicJsonForDotNET.0.9.8\lib\40\DynamicJson.dll</HintPath>
+    </Reference>
+    <Reference Include="Dynamitey">
+      <HintPath>packages\Dynamitey.1.0.2.0\lib\net40\Dynamitey.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core">
+      <HintPath>packages\FSharp.Core.3.1.2.1\lib\net40\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Interop.Dynamic">
+      <HintPath>packages\FSharp.Interop.Dynamic.3.0.0.0\lib\portable-net45+sl50+win\FSharp.Interop.Dynamic.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.1\Framework\v4.0\Microsoft.FSharp.Targets" />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
