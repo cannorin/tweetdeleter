@@ -80,7 +80,6 @@ module Main =
       let l = Seq.length dts in
       printf "Do you want to delete these %i tweets? [Y/n] " l;
       if Console.ReadLine().ToLower() <> "n" then
-        seq {
           let c = ref 1 in
           for (i, _) in dts do
             let rec loop () =
@@ -91,18 +90,16 @@ module Main =
               with
                 | :? TwitterException as e -> 
                   if e.Status = Net.HttpStatusCode.NotFound then
-                    printfn "This tweet is already deleted."
+                    printfn "This tweet is already deleted(%i/%i)." cc l
                   else
                     printfn "It seems to be rate limited. Waiting for 10 secs...";
                     Thread.Sleep 10000;
                     loop ()
                 | e -> raise e
                 in
-            yield Task.Run loop
+            loop() 
             c := !c + 1
             Thread.Sleep 250
-        } |> Task.WhenAll 
-          |> fun f -> f.Start()
 
       printfn "Done."
       0
