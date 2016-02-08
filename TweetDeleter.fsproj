@@ -27,13 +27,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="CoreTweet">
-      <HintPath>packages\CoreTweet.0.6.1.267\lib\net45\CoreTweet.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Antlr3.Runtime">
       <HintPath>packages\DynamicJsonForDotNET.0.9.8\lib\40\Antlr3.Runtime.dll</HintPath>
     </Reference>
@@ -57,5 +51,11 @@
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.1\Framework\v4.0\Microsoft.FSharp.Targets" />
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CoreTweet\CoreTweet.net45\CoreTweet.net45.csproj">
+      <Project>{5AE5A341-5E2B-42AF-946A-7043BAD12817}</Project>
+      <Name>CoreTweet.net45</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

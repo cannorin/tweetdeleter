@@ -56,16 +56,15 @@ module Main =
                       let j = (JsonArray.Parse x).Values in
                       Seq.map (fun y -> 
                         (
-                          (string y?id_str).Replace("\"", "") |> Int64.Parse, 
+                          (string y?id_str).Replace("\"", "") |> Int64.Parse,
+                          (y?Has ("retweeted_status") : bool),
                           DateTime.ParseExact((string y?created_at).Replace("\"", ""), "yyyy-MM-dd HH:mm:ss +0000", CultureInfo.InvariantCulture)
                         )
                       ) j
                    )
                    |> Seq.concat in
-
       
       let dts =
-
         printf "Do you speficy the period of tweet you want to delete? [y/N] ";
         if Console.ReadLine().ToLower() = "y" then
           let fmt = "yyyy/MM/dd HH:mm:ss" in
@@ -73,36 +72,45 @@ module Main =
           let sd = DateTime.ParseExact(Console.ReadLine(), fmt, CultureInfo.InvariantCulture) in
           printfn "Input finish date in UTC +0. [%s]" fmt; printf "> ";
           let fd = DateTime.ParseExact(Console.ReadLine(), fmt, CultureInfo.InvariantCulture) in
-          Seq.filter (fun (_, d) -> sd < d && d < fd) ts
+          Seq.filter (fun (_, _, d) -> sd < d && d < fd) ts
         else ts in
-
+      
       printfn "Reading json(s)..."
       let l = Seq.length dts in
       printf "Do you want to delete these %i tweets? [Y/n] " l;
+      let errs = new System.Collections.Generic.List<int64>() in
       if Console.ReadLine().ToLower() <> "n" then
           let c = ref 1 in
-          for (i, _) in dts do
+          for (i, b, _) in dts do
             let rec loop () =
               let cc = !c in
-              try 
-                t.Statuses.Destroy(id = i) |> ignore;
+              try
+                if b then
+                  t.Statuses.Unretweet(id = i) |> ignore;
+                else
+                  t.Statuses.Destroy(id = i) |> ignore;
                 printfn "Deleted: %i/%i" cc l
               with
                 | :? TwitterException as e -> 
                   if e.Status = Net.HttpStatusCode.NotFound then
                     printfn "This tweet is already deleted(%i/%i)." cc l
                   else
-                    printfn "It seems to be rate limited. Waiting for 10 secs...";
-                    Thread.Sleep 10000;
-                    loop ()
+                    printfn "Error:   %i/%i (%s)" cc l e.Message;
+                    errs.Add i
                 | e -> raise e
                 in
             loop() 
             c := !c + 1
             Thread.Sleep 250
 
-      printfn "Done."
-      0
+      if errs.Any() then
+        let printerr (x : string) = System.Console.Error.WriteLine x in
+        sprintf "Couldn't delete these %i tweets." errs.Count |> printerr
+        Seq.iter (sprintf "%i" >> printerr) errs
+        1
+      else
+        printfn "Done."
+        0
 
   end
 
